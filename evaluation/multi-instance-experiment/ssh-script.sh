@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ## Steps:
 ## - clone the repository to a temp directory (requires access to clone the repo)
@@ -22,19 +22,6 @@ PRIVATE_KEY=$1
 ## The user and IP address or hostname of the server
 HOSTNAME=$2
 
-FORK="andromeda"
-BRANCH="main"
 USER="ubuntu"
 
-ssh -o StrictHostKeyChecking=no -o 'ConnectionAttempts 10' -i $PRIVATE_KEY "${USER}@${HOSTNAME}" /bin/bash <<EOF
-rm -rf pash
-git clone https://github.com/$FORK/pash.git
-cd pash
-git checkout $BRANCH
-echo "At branch: \$(git rev-parse --abbrev-ref HEAD) of \$(git remote get-url origin)"
-sed -i 's#git@github.com:angelhof/libdash.git#https://github.com/angelhof/libdash/#g' .gitmodules
-source scripts/install.sh -p
-cd compiler
-./test_evaluation_scripts.sh
-EOF
-
+ssh -o StrictHostKeyChecking=no -o 'ConnectionAttempts 10' -i $PRIVATE_KEY "${USER}@${HOSTNAME}" /bin/bash

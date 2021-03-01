@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ## Steps:
 ## - clone the repository to a temp directory (requires access to clone the repo)
@@ -11,30 +11,22 @@
 
 set -e
 
-if [ $# -lt 2 ]; then
+if [ $# -lt 3 ]; then
  echo "Not enough arguments!"
  exit 1
 fi
 
+## The directory to save the results in
+LOCAL_DIR=$1
+
 ## The path of the private key for ssh authentication
-PRIVATE_KEY=$1
+PRIVATE_KEY=$2
 
 ## The user and IP address or hostname of the server
-HOSTNAME=$2
+HOSTNAME=$3
 
-FORK="andromeda"
-BRANCH="main"
 USER="ubuntu"
+RESULT_DIR="/home/${USER}/pash/evaluation/results/eurosys_small"
 
-ssh -o StrictHostKeyChecking=no -o 'ConnectionAttempts 10' -i $PRIVATE_KEY "${USER}@${HOSTNAME}" /bin/bash <<EOF
-rm -rf pash
-git clone https://github.com/$FORK/pash.git
-cd pash
-git checkout $BRANCH
-echo "At branch: \$(git rev-parse --abbrev-ref HEAD) of \$(git remote get-url origin)"
-sed -i 's#git@github.com:angelhof/libdash.git#https://github.com/angelhof/libdash/#g' .gitmodules
-source scripts/install.sh -p
-cd compiler
-./test_evaluation_scripts.sh
-EOF
-
+mkdir -p "$LOCAL_DIR"
+scp -o StrictHostKeyChecking=no -o 'ConnectionAttempts 10' -i $PRIVATE_KEY -r "${USER}@${HOSTNAME}:${RESULT_DIR}" "${LOCAL_DIR}"
