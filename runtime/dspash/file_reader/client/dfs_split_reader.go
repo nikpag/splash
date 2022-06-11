@@ -21,7 +21,6 @@ var (
 	config     = flag.String("config", "", "File to read")
 	splitNum   = flag.Int("split", 0, "The logical split number")
 	serverPort = flag.Int("port", 50051, "The server port, all machines should use same port")
-	prefix     = flag.String("prefix", "", "The top directory")
 )
 
 // Distrubted file system block
@@ -55,7 +54,7 @@ func readFirstLine(block DFSBlock, writer *bufio.Writer) (ok bool, e error) {
 
 		client := pb.NewFileReaderClient(conn)
 
-		stream, err := client.ReadFile(ctx, &pb.FileRequest{Path: *prefix + block.Path})
+		stream, err := client.ReadFile(ctx, &pb.FileRequest{Path: block.Path})
 		if err != nil {
 			continue
 		}
@@ -83,10 +82,6 @@ func readFirstLine(block DFSBlock, writer *bufio.Writer) (ok bool, e error) {
 		}
 	}
 	return
-}
-
-func getAbsPath(s string) string {
-	return os.ExpandEnv(*prefix + s)
 }
 
 func readLocalFile(p string, skipFirstLine bool, writer *bufio.Writer) error {
@@ -123,7 +118,12 @@ func readDFSLogicalSplit(conf DFSConfig, split int) error {
 		skipFirstLine = false
 	}
 
-	err := readLocalFile(getAbsPath(conf.Blocks[split].Path), skipFirstLine, writer)
+	filepath, err := pb.GetAbsPath(conf.Blocks[split].Path)
+	if err != nil {
+		return err
+	}
+
+	err = readLocalFile(filepath, skipFirstLine, writer)
 	if err != nil {
 		return err
 	}

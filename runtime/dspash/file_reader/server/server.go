@@ -24,7 +24,13 @@ type fileReaderServer struct {
 }
 
 func (s *fileReaderServer) ReadFile(req *pb.FileRequest, stream pb.FileReader_ReadFileServer) error {
-	file, err := os.Open(os.ExpandEnv(req.Path))
+	filename, err := pb.GetAbsPath(req.Path)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Println(err)
 		return err
