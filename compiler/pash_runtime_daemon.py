@@ -295,6 +295,7 @@ class Scheduler:
             self.wait_for_all()
             
         if compile_success:
+            self.wait_for_limit(config.pash_args.parallel_pipelines_limit)
             response = success_response(
                 f'{process_id} {compiled_script_file} {var_file} {input_ir_file}')
         else:
@@ -325,9 +326,9 @@ class Scheduler:
         self.next_id += 1
         return self.next_id
 
-    def wait_for_all(self):
-        log("Waiting for all processes to finish. There are", self.running_procs, "processes remaining.")
-        while self.running_procs > 0:
+    def wait_for_limit(self, limit):
+        log("Waiting for for number of processes to be less than limit")
+        while self.running_procs > limit:
             input_cmd = self.get_input()
             # must be exit command or something is wrong
             if (input_cmd.startswith("Exit:")):
@@ -335,6 +336,10 @@ class Scheduler:
             else:
                 raise Exception(
                     f"Command should be exit but it was {input_cmd}")
+
+    def wait_for_all(self):
+        log("Waiting for all processes to finish. There are", self.running_procs, "processes remaining.")
+        self.wait_for_limit(0)
         self.unsafe_running = False
 
     def handle_exit(self, input_cmd):
