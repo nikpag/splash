@@ -3,12 +3,15 @@
 PASH_TOP=${PASH_TOP:-$(git rev-parse --show-toplevel)}
 . "$PASH_TOP/scripts/utils.sh"
 cd $(dirname $0)
+input_files=("100M.txt")
+local_fils=("dict.txt")
 
 [ "$1" = "-c" ] && rm-files 100M.txt words sorted_words
 
+hdfs dfs -mkdir -p /intro
 
 if [ ! -f ./100M.txt ]; then
-  curl -sf --connect-timeout 10 'atlas-group.cs.brown.edu/data/dummy/100M.txt' > 100M.txt
+  curl -sf --connect-timeout 10 'ndr.md/data/dummy/100M.txt' > 100M.txt
   if [ $? -ne 0 ]; then
     # Pipe curl through tac (twice) in order to consume all the output from curl.
     # This way, curl can write the whole page and not emit an error code.
@@ -23,7 +26,7 @@ if [ ! -f ./100M.txt ]; then
 fi
 
 if [ ! -f ./words ]; then
-  curl -sf --connect-timeout 10 'atlas-group.cs.brown.edu/data/dummy/words' > words
+  curl -sf --connect-timeout 10 'http://ndr.md/data/dummy/words' > words
   if [ $? -ne 0 ]; then
     curl -sf 'https://zenodo.org/record/7650885/files/words' > words
     if [ $? -ne 0 ]; then
@@ -42,3 +45,9 @@ fi
 if [ ! -f ./sorted_words ]; then
   sort words > sorted_words
 fi
+
+# Add files with different replication factors
+for file in "${input_files[@]}"; do
+    hdfs dfs -put $file /intro/$file
+    rm -f $file
+done
