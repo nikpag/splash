@@ -1,32 +1,20 @@
-## PaSh: Light-touch Data-Parallel Shell Processing
+## SPLaSh: Scaling Out Shell Scripts on Serverless Platforms
 
-> _A system for parallelizing POSIX shell scripts._
-> _Hosted by the [Linux Foundation](https://linuxfoundation.org/press-release/linux-foundation-to-host-the-pash-project-accelerating-shell-scripting-with-automated-parallelization-for-industrial-use-cases/)._
+> _A system for deploying POSIX shell scripts to serverless._
 
+## Running SPLaSh
 
-| Service      | Main | Develop |
-| :---         |    :----:   |          :----: |
-| Tests      | [![Tests](https://github.com/binpash/pash/actions/workflows/tests.yaml/badge.svg?branch=main&event=push)](https://github.com/binpash/pash/actions/workflows/tests.yaml?query=branch%3Amain++)     | [![Tests](https://github.com/binpash/pash/actions/workflows/tests.yaml/badge.svg?branch=future&event=push)](https://github.com/binpash/pash/actions/workflows/tests.yaml?query=branch%3Afuture++)   |
-| Build   | [![Build](https://github.com/binpash/pash/actions/workflows/build.yaml/badge.svg?branch=main&event=push)](https://github.com/binpash/pash/actions/workflows/build.yaml?query=branch%3Amain++)        | [![Build](https://github.com/binpash/pash/actions/workflows/build.yaml/badge.svg?branch=future&event=push)](https://github.com/binpash/pash/actions/workflows/build.yaml?query=branch%3Afuture++)      |
-| Pages     | [![DeployPublish](https://github.com/binpash/web/actions/workflows/pages.yaml/badge.svg)](https://github.com/binpash/web/actions/workflows/pages.yaml) | [![DeployPublish](https://github.com/binpash/web/actions/workflows/pages.yaml/badge.svg)](https://github.com/binpash/web/actions/workflows/pages.yaml) |
-
-
-Quick Jump: [Running PaSh](#running-pash) | [Installation](#installation) | [Testing](#testing) | [Repo Structure](#repo-structure) | [Community & More](#community--more) | [Citing](#citing)
-
-## Running PaSh
-
-To parallelize, say, `./evaluation/intro/hello-world.sh` with parallelization degree of 2× run:
+To parallelize, say, `./evaluation/intro/hello-world.sh` with a parallelization degree of 2× run:
 
 ```sh
-./pa.sh ./evaluation/intro/hello-world.sh
+./pa.sh --serverless_exec -w 2 ./evaluation/intro/hello-world.sh
 ```
 
 Run `./pa.sh --help` to get more information about the available commands.
-Jump to [docs/tutorial](docs/tutorial/) for a longer tutorial.
 
 ## Installation
 
-On Ubuntu, Fedora, and Debian run the following to set up PaSh.
+On Ubuntu, Fedora, and Debian, run the following to set up SPLaSh.
 ```sh
 wget https://raw.githubusercontent.com/binpash/pash/main/scripts/up.sh
 sh up.sh
@@ -39,12 +27,12 @@ For more details, manual installation, or other platforms see [installation inst
 
 ## Repo Structure
 
-This repo hosts the core `pash` development. The structure is as follows:
+This repo is a frozen version of `splash`. For the most up-to-date version, visit https://github.com/binpash/pash. The structure is as follows:
 
-* [compiler](./compiler): Shell-dataflow translations and associated parallelization transformations.
+* [compiler](./compiler): Shell-dataflow translations, associated parallelization transformations, and serverless transformations/primitives.
 * [docs](./docs): Design documents, tutorials, installation instructions, etc.
 * [evaluation](./evaluation): Shell pipelines and example [scripts](./evaluation/other/more-scripts) used for the evaluation.
-* [runtime](./runtime): Runtime component — e.g., `eager`, `split`, and associated combiners.
+* [runtime](./runtime): Runtime components for the shell—e.g., `eager`, `split`—and serverless execution—e.g., `invoke-lambda`,`send-object`.
 * [scripts](./scripts): Scripts related to continuous integration, deployment, and testing.
 
 ## Community & More
@@ -59,24 +47,3 @@ Mailing Lists:
 Development/contributions:
 * Contribution guide: [docs/contributing](docs/contributing/contrib.md)
 * Continuous Integration Server: [ci.binpa.sh](http://ci.binpa.sh)
-
-## Citing
-
-If you used PaSh, consider citing the following paper:
-```
-@inproceedings{pash2021eurosys,
-author = {Vasilakis, Nikos and Kallas, Konstantinos and Mamouras, Konstantinos and Benetopoulos, Achilles and Cvetkovi\'{c}, Lazar},
-title = {PaSh: Light-Touch Data-Parallel Shell Processing},
-year = {2021},
-isbn = {9781450383349},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/3447786.3456228},
-doi = {10.1145/3447786.3456228},
-pages = {49–66},
-numpages = {18},
-keywords = {POSIX, Unix, pipelines, automatic parallelization, source-to-source compiler, shell},
-location = {Online Event, United Kingdom},
-series = {EuroSys '21}
-}
-```
